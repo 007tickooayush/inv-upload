@@ -45,6 +45,26 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=file_handle
       - MYSQL_USER=root
+  # pyspark:
+  #   image: ykursadkaya/pyspark-docker
+  #   container_name: pyspark-file
+  #   ports:
+  #     - "4040:4040"
+  #   volumes:
+  #     - ./pyspark:/pyspark
+  #   environment:
+  #     - PYTHON_VERSION=3.9.5
+  backview:
+    container_name: backview-file
+    build: ./backview
+    ports:
+      - "8000:8000"
+    volumes:
+        - ./backview:/backview
+    environment:
+      - PORT=8000
+      - HOST=127.0.0.1
+    #   - FAST_APP_BACKEND_URL=http://localhost:
   backend:
     container_name: backend-file
     build: ./backend
