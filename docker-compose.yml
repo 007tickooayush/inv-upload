@@ -22,23 +22,29 @@ services:
       - "27018:27017"
     volumes:
       - ./mongo:/data/db
-  hdfs:
-    container_name: hdfs-file
-    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
-    volumes:
-      - ./hdfs:/hadoop/dfs/name
-    ports:
-      - "9870:9870"
-    environment:
-      - CLUSTER_NAME=test
-  # datanode:
-  #   container_name: datanode-file
-  #   image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-  #   volumes:
-  #     - ./hadoop_datanode:/hadoop/dfs/data
+  # spark:
+  #   image: bde2020/spark-master:2.4.4-hadoop2.7
+  #   container_name: spark-file
+  #   ports:
+  #     - "8090:8080"
+  #     - "7077:7077"
   #   environment:
-  #     SERVICE_PRECONDITION: "namenode:9870"
-        
+  #     - SPARK_MODE=master
+  #     - SPARK_RPC_AUTHENTICATION_ENABLED=no
+  #     - SPARK_RPC_ENCRYPTION_ENABLED=no
+  #     - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+  #     - SPARK_SSL_ENABLED=no   
+  mysql:
+    image: mysql
+    container_name: mysql-file
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=file_handle
+      - MYSQL_USER=root
   backend:
     container_name: backend-file
     build: ./backend
@@ -51,6 +57,11 @@ services:
       - MONGO_URL=mongodb://mongo:27017/file_handle
       - KAFKA_HOST=kafka:9092
       - KAFKA_TOPIC=file_handle
-      - UPLOAD_PATH=UPLOAD_PATH=uploads/
+      - UPLOAD_PATH=uploads/
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=file_handle
 
 

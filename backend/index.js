@@ -41,6 +41,50 @@ const File = mongoose.model('File', fileSchema);
 
 // x----------------------------- mongoose -----------------------------x
 
+// ------------------------------ mysql ------------------------------
+const {Sequelize, DataTypes} = require('sequelize');
+
+
+const sequelize = new Sequelize({
+    host: process.env.MYSQL_HOST,
+    port: process.env.MYSQL_PORT,
+    username: process.env.MYSQL_USER,
+    password: process.env.MYSQL_ROOT_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
+    dialect: 'mysql'
+});
+
+console.log('------------------------------------ DB NAME: ',sequelize.getDatabaseName());
+
+const Data = sequelize.define('data', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    vid_id: {
+        type: DataTypes.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+        unique: true
+    },
+    name: {
+        type : DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
+    filename: DataTypes.STRING,
+    size: DataTypes.INTEGER,
+    type: DataTypes.STRING,
+    file: DataTypes.BLOB('long')
+});
+
+Data.sync({ force: false }).then(() => {
+    console.log('Data table created or exists already');
+}).catch((err) => {
+    console.log('Error creating data table', err);
+});
+// x----------------------------- mysql -----------------------------x
 
 // ------------------------------ multer ------------------------------
 const multer = require('multer');
@@ -111,17 +155,27 @@ app.post('/upload-local', uploadDisk.single('file'), async (req, res) => {
         console.log(err);
         res.status(500).send('Error saving file');
     });
-
-    // try {
-    //     await file.save();
-    //     await sendFileMessage(file); // Send file message using kafkajs
-    //     res.send(file);
-    // } catch (err) {
-    //     console.log(err);
-    //     res.status(500).send('Error saving file');
-    // }
 });
 
+
+app.get('/download-mysql/:uuid', (req,res) => {
+    Data.findOne({
+        where: {
+            vid_id: req.params.uuid
+        }
+    }).then((result) => {
+        if (result) {
+            res.setHeader('Content-Type', result.type);
+            res.setHeader('Content-Disposition', 'attachment; filename=' + result.name);
+            res.send(result.file);
+        } else {
+            res.status(404).send('File not found');
+        }
+    }).catch((err) => {
+        console.log(err);
+        res.status(500).send('Error downloading file');
+    });
+});
 
 app.post('/upload-local-multiple', uploadDisk.array('files'), async (req, res) => {
     const files = req.files.map((file) => {
@@ -163,6 +217,30 @@ app.get('/download/:file', (req,res) => {
     }
 });
 
+const multerMemoryStorage = multer.memoryStorage(); // Use memory storage instead of disk storage
+
+const uploadMemory = multer({ storage: multerMemoryStorage });
+
+app.post('/upload-mysql', uploadDisk.single('file'), async (req, res) => {
+    // Read the file from the uploads directory
+    const fileData = fs.readFileSync(req.file.path);
+
+    Data.create({
+        name: req.file.originalname,
+        filename: req.file.filename,
+        size: req.file.size,
+        type: req.file.mimetype,
+        file: fileData // Set the file attribute with the file data
+    }).then((result) => {
+        console.log('result :>> ', result);
+        res.status(200).send({ message: 'File uploaded successfully' });
+    }).catch((err) => {
+        console.log(err);
+        res.status(500).send({ error: err, message: 'Error saving file' });
+    }).finally(() => {
+        fs.unlinkSync(req.file.path); // Delete the file from the uploads directory
+    });
+});
 
 app.get('/files', (req, res) => {
     File.find().then((result) => {
