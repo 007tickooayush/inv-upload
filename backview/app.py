@@ -12,7 +12,7 @@ def read_root():
     print("Hello World")
     return {"Hello": "Ayush Tickoo"}
 
-@app.get("/demo")
+@app.get("/demo1")
 def get_demo():
     return {"Hello": "DEMO"}
 
