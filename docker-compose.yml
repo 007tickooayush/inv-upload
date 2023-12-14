@@ -1,0 +1,56 @@
+version: '3'
+services:
+  # zookeeper:
+  #   image: wurstmeister/zookeeper
+  #   container_name: zookeeper-file
+  #   ports:
+  #     - "2183:2181"
+  # kafka:
+  #   image: wurstmeister/kafka
+  #   container_name: kafka-file
+  #   ports:
+  #     - "9093:9092"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   environment:
+  #     KAFKA_ADVERTISED_HOST_NAME: kafka
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  mongo:
+    image: mongo
+    container_name: mongo-file
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./mongo:/data/db
+  hdfs:
+    container_name: hdfs-file
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    volumes:
+      - ./hdfs:/hadoop/dfs/name
+    ports:
+      - "9870:9870"
+    environment:
+      - CLUSTER_NAME=test
+  # datanode:
+  #   container_name: datanode-file
+  #   image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+  #   volumes:
+  #     - ./hadoop_datanode:/hadoop/dfs/data
+  #   environment:
+  #     SERVICE_PRECONDITION: "namenode:9870"
+        
+  backend:
+    container_name: backend-file
+    build: ./backend
+    ports:
+      - "3020:3020"
+    volumes:
+        - ./backend:/backend
+    environment:
+      - PORT=3020
+      - MONGO_URL=mongodb://mongo:27017/file_handle
+      - KAFKA_HOST=kafka:9092
+      - KAFKA_TOPIC=file_handle
+      - UPLOAD_PATH=UPLOAD_PATH=uploads/
+
+
