@@ -1,6 +1,6 @@
 # INV-UPLOAD
 
-Basic file handling approaches using http, with distributed systems using nodejs, fastAPI, mongoDB, and mysql.
+Basic file handling approaches using http Requests, using nodejs, fastAPI, mongoDB, and mysql.
 
 ## Table of Contents
 
