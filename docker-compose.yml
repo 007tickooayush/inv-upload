@@ -64,6 +64,11 @@ services:
     environment:
       - PORT=8000
       - HOST=127.0.0.1
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=file_handle
+      - MYSQL_USER=root
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
     #   - FAST_APP_BACKEND_URL=http://localhost:
   backend:
     container_name: backend-file

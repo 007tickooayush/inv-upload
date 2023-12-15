@@ -7,6 +7,11 @@ WORKDIR /backview
 # Copy the requirements file into the container
 COPY requirements.txt /backview/
 
+# Install mysql-connector-java for pyspark
+RUN apt-get update && apt-get install -y default-jre
+RUN apt-get update && apt-get install -y curl
+RUN curl -L -o /tmp/mysql-connector-java-8.0.23.jar https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.23/mysql-connector-java-8.0.23.jar
+
 # Install the Python dependencies
 RUN pip install -r requirements.txt
 

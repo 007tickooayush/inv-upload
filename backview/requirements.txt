@@ -3,3 +3,5 @@ pandas
 fastapi
 uvicorn
 python-dotenv
+findspark
+pyspark
