@@ -1,6 +1,6 @@
 # INV-UPLOAD
 
-A brief description of your project.
+Basic file handling approaches using http, with distributed systems using nodejs, fastAPI, mongoDB, and mysql.
 
 ## Table of Contents
 
