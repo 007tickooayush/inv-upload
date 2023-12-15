@@ -25,3 +25,5 @@ Thumbs.db
 uploads/
 mongo/
 /mysql/
+venv/
+spark-warehouse/
